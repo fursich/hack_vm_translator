@@ -1,7 +1,7 @@
 require_relative './test_helper'
 
 module Expression
-  module NodeFactoryTestHelper
+  module ExpressionTransformerTestHelper
     def self.prepare_node(text, source_location:)
       tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize
       parse_node = Parser::NodeFactory.new(tokens, source_location: source_location).build
@@ -20,9 +20,9 @@ module Expression
     end
   end
 
-  class TestTokeninzer < Minitest::Test
+  class TestExpressionTransformer < Minitest::Test
     def test_source_location
-      NodeFactoryTestHelper.node_with_input(
+      ExpressionTransformerTestHelper.node_with_input(
         'pop argument 2',
         source_location: 123,
       ) do |node|
@@ -31,7 +31,7 @@ module Expression
     end
 
     def test_command_push
-      NodeFactoryTestHelper.expression_with_input(
+      ExpressionTransformerTestHelper.expression_with_input(
         'push constant 123',
         source_location: 123,
       ) do |expression|
@@ -40,7 +40,7 @@ module Expression
     end
 
     def test_command_pop
-      NodeFactoryTestHelper.expression_with_input(
+      ExpressionTransformerTestHelper.expression_with_input(
         'pop this 3',
         source_location: 123,
       ) do |expression|
@@ -49,7 +49,7 @@ module Expression
     end
 
     def test_command_if_goto
-      NodeFactoryTestHelper.expression_with_input(
+      ExpressionTransformerTestHelper.expression_with_input(
         'if_goto A.Symbol',
         source_location: 123,
       ) do |expression|

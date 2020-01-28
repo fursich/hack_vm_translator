@@ -20,7 +20,7 @@ module Parser
     end
   end
 
-  class TestTokeninzer < Minitest::Test
+  class TestNodeFactory < Minitest::Test
     def test_source_location
       NodeFactoryTestHelper.builder_with_input(
         '',

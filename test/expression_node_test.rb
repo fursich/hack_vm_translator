@@ -1,7 +1,7 @@
 require_relative './test_helper'
 
 module Expression
-  module NodeFactoryTestHelper
+  module ExpressionNodeTestHelper
     def self.prepare_node(text, source_location:)
       tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize
       parse_node = Parser::NodeFactory.new(tokens, source_location: source_location).build
@@ -15,9 +15,9 @@ module Expression
     end
   end
 
-  class TestTokeninzer < Minitest::Test
+  class TestExpressionNode < Minitest::Test
     def test_command_push_constant
-      NodeFactoryTestHelper.node_with_input(
+      ExpressionNodeTestHelper.node_with_input(
         'push constant 2',
         source_location: 3,
       ) do |node|
@@ -34,7 +34,7 @@ module Expression
     end
 
     def test_command_push_pointer
-      NodeFactoryTestHelper.node_with_input(
+      ExpressionNodeTestHelper.node_with_input(
         'push pointer 1',
         source_location: 3,
       ) do |node|
@@ -51,7 +51,7 @@ module Expression
     end
 
     def test_command_push_this
-      NodeFactoryTestHelper.node_with_input(
+      ExpressionNodeTestHelper.node_with_input(
         'push this 1',
         source_location: 3,
       ) do |node|
@@ -70,7 +70,7 @@ module Expression
     end
 
     def test_command_pop_argument
-      NodeFactoryTestHelper.node_with_input(
+      ExpressionNodeTestHelper.node_with_input(
         'pop argument 2',
         source_location: 3,
       ) do |node|
@@ -89,7 +89,7 @@ module Expression
     end
 
     def test_command_pop_temp
-      NodeFactoryTestHelper.node_with_input(
+      ExpressionNodeTestHelper.node_with_input(
         'pop temp 3',
         source_location: 3,
       ) do |node|
@@ -106,7 +106,7 @@ module Expression
 
 
     def test_command_add
-      NodeFactoryTestHelper.node_with_input(
+      ExpressionNodeTestHelper.node_with_input(
         'add',
         source_location: 3,
       ) do |node|
