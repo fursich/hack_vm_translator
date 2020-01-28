@@ -7,7 +7,7 @@ require 'forwardable'
 
 require_relative 'utils/fileio'
 require_relative 'utils/inflector'
-require_relative 'parser/tokenizer'
+require_relative 'lexer/tokenizer'
 require_relative 'parser/node_factory'
 require_relative 'expression/node/base'
 

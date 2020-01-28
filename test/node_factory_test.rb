@@ -3,7 +3,7 @@ require_relative './test_helper'
 module Parser
   module NodeFactoryTestHelper
     def self.prepare_builder(text, source_location:)
-      tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize
+      tokens  = Lexer::Tokenizer.new(text, source_location: source_location).tokenize
       Parser::NodeFactory.new(tokens, source_location: source_location)
     end
 

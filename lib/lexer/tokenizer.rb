@@ -1,11 +1,11 @@
 require_relative 'token_collection'
 
-module Parser
-  class ParseError < StandardError; end
+class ParseError < StandardError; end
+
+module Lexer
   class UndefinedCommandPattern < ParseError; end
 
   class Tokenizer
-
     def initialize(text, source_location:)
       @text   = strip_ignorables(text)
       @source_location = source_location

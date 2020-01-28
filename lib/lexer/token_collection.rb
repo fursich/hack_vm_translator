@@ -1,6 +1,7 @@
-module Parser
+module Lexer
   class TokenCollection
     attr_reader :size
+    attr_accessor :command_type, :operand_types
 
     def initialize(tokens)
       @tokens = tokens
