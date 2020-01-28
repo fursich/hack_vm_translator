@@ -15,11 +15,11 @@ module Lexer
 
   class TestTokenizer < Minitest::Test
     def test_source_location
-      TokenizerTestHelper.tokenizer_with_input(
-        "",
+      TokenizerTestHelper.tokens_with_input(
+        "foobar",
         source_location: 123,
-      ) do |tokenizer|
-        assert_equal 123, tokenizer.instance_eval { @source_location }
+      ) do |tokens|
+        assert_equal 123, tokens.source_location
       end
     end
 

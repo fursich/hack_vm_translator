@@ -26,8 +26,8 @@ module Lexer
       tokens = @text.split(/\s+/)
       return if tokens.empty?
 
-      @token_collection = TokenCollection.new(tokens)
-      return @token_collection if @token_collection.valid?
+      token_collection = TokenCollection.new(tokens, source_location: @source_location)
+      return token_collection if token_collection.valid?
 
       raise UndefinedCommandPattern, "invalid command forms with <#{@text}> at line #{@source_location}"
     end
