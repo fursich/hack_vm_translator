@@ -3,7 +3,7 @@ require_relative './test_helper'
 module Expression
   module ExpressionTransformerTestHelper
     def self.prepare_node(text, source_location:)
-      tokens  = Lexer::Tokenizer.new(text, source_location: source_location).tokenize
+      tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize
       parse_node = Parser::NodeFactory.new(tokens, source_location: source_location).build
     end
 

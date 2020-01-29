@@ -1,11 +1,11 @@
-module Lexer
+module Parser
   class TokenCollection
-    attr_reader :size, :source_location
+    attr_reader :raw_text, :source_location
     attr_accessor :command_type, :operand_types
 
-    def initialize(tokens, source_location:)
+    def initialize(tokens, raw_text:, source_location:)
       @tokens = tokens
-      @size = tokens.size
+      @raw_text = raw_text
       @source_location = source_location
     end
 
@@ -17,8 +17,8 @@ module Lexer
       @tokens.slice(1..2)
     end
 
-    def valid?
-      size.between?(1, 3)
+    def size
+      @tokens.size
     end
   end
 end

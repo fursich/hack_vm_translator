@@ -1,14 +1,14 @@
 require_relative './test_helper'
 
-module Lexer
+module Parser
   module TypeMatcherTestHelper
     def self.tokenize(text, source_location:)
-      Lexer::Tokenizer.new(text, source_location: source_location).tokenize
+      Parser::Tokenizer.new(text, source_location: source_location).tokenize
     end
 
     def self.tokens_with_input(text, source_location:, &block)
       tokens = tokenize(text, source_location: source_location)
-      Lexer::TypeMatcher.new.analyze!(tokens)
+      Parser::TypeMatcher.new.collate!(tokens)
       block.call tokens
     end
   end
@@ -20,6 +20,15 @@ module Lexer
         source_location: 123,
       ) do |tokens|
         assert_equal 123, tokens.source_location
+      end
+    end
+
+    def test_raw_text
+      TypeMatcherTestHelper.tokens_with_input(
+        "push local 3",
+        source_location: 123,
+      ) do |tokens|
+        assert_equal "push local 3", tokens.raw_text
       end
     end
 
@@ -64,8 +73,8 @@ module Lexer
           command,
           source_location: 123,
         )
-        assert_raises(InvalidCommandName) {
-          Lexer::TypeMatcher.new.analyze!(tokens)
+        assert_raises(Parser::InvalidCommandName) {
+          Parser::TypeMatcher.new.collate!(tokens)
         }
       end
     end
@@ -90,8 +99,8 @@ module Lexer
           "goto #{operand}",
           source_location: 123,
         )
-        assert_raises(InvalidOperandType) {
-          Lexer::TypeMatcher.new.analyze!(tokens)
+        assert_raises(Parser::InvalidOperandName) {
+          Parser::TypeMatcher.new.collate!(tokens)
         }
       end
     end
@@ -110,6 +119,16 @@ module Lexer
           assert_equal [:"memory_segment/#{segment}", :number], tokens.operand_types
         end
       end
+    end
+
+    def test_command_with_three_or_more_operands
+      tokens = TypeMatcherTestHelper.tokenize(
+        'pop local 3 1',
+        source_location: 123,
+      )
+      assert_raises(Parser::UndefinedCommandPattern) {
+        Parser::TypeMatcher.new.collate!(tokens)
+      }
     end
   end
 end
