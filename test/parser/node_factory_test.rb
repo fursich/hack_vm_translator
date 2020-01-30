@@ -1,4 +1,4 @@
-require_relative './test_helper'
+require 'test_helper'
 
 module Parser
   module NodeFactoryTestHelper
@@ -81,6 +81,15 @@ module Parser
       }
 
       assert_raises(InvalidOperandName) { Parser::NodeFactory.new(tokens).build }
+    end
+
+    def test_command_invalid_argument_size
+      NodeFactoryTestHelper.builder_with_input(
+        'add 213',
+        source_location: 123,
+      ) do |builder|
+        assert_raises(InvalidOperandSize) { builder.build }
+      end
     end
 
     def test_command_invalid_argument_type
