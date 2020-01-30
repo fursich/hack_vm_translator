@@ -1,11 +1,4 @@
 module Parser
-  class ParseError < StandardError; end
-  class UndefinedCommandPattern < ParseError; end
-  class InvalidCommandName < ParseError; end
-  class InvalidOperandName < ParseError; end
-end
-
-module Parser
   module Matchers
     TOKEN_SIZE     = 1..3
     COMMANDS       = %w(push pop add sub neg not and or eq lt gt label goto if_goto function call return)

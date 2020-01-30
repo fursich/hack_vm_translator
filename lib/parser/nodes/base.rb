@@ -1,8 +1,4 @@
 module Parser
-  class InvalidOperands < ParseError; end
-  class InvalidOperandSize < InvalidOperands; end
-  class InvalidOperandType < InvalidOperands; end
-
   module Node
     class Base
       include Inflector
