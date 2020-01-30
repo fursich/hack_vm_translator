@@ -1,6 +1,6 @@
 module Expression
   module Node
-    class Base
-    end
+    class Symbol < OperandBase; end
   end
 end
+
