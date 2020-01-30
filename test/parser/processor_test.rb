@@ -2,87 +2,62 @@ require 'test_helper'
 
 module Parser
   module ProcessorTestHelper
-    def self.prepare_processor(source, &block)
-      source_with_lineno = source.map_with_index { |text, line_no| [line_no, text] }
-      Parser::Processor.new(source_with_lineno)
+    def self.prepare_processor(*text, &block)
+      text_with_lineno = text.map.with_index(1) { |text, line_no| [line_no, text] }
+      Parser::Processor.new(text_with_lineno)
     end
 
-    def self.processor_with_input(source, &block)
-      processor = prepare_processor(source, &block)
+    def self.processor_with_input(*text, &block)
+      processor = prepare_processor(*text, &block)
       block.call processor
     end
 
-    def self.build_with_input(text, source_location:, &block)
-      processor = prepare_processor(source, &block)
+    def self.process(*text, &block)
+      processor = prepare_processor(*text, &block)
       block.call processor.parse!
     end
   end
 
   class TestProcessor < Minitest::Test
     def test_source_location
-      ProcessorTestHelper.build_with_input(
+      ProcessorTestHelper.process(
         'push constant 1',
-        source_location: 123,
-      ) do |command_node|
-        assert_equal 123, command_node.source_location
+        'if_goto A.Symbol',
+      ) do |nodes|
+        assert_equal 1, nodes[0].source_location
+        assert_equal 2, nodes[1].source_location
       end
     end
 
     def test_raw_text
-      ProcessorTestHelper.build_with_input(
-        'push constant 1',
-        source_location: 123,
-      ) do |command_node|
-        assert_equal 'push constant 1', command_node.raw_text
+      ProcessorTestHelper.process(
+        'pop local 3',
+        'push constant 10',
+      ) do |nodes|
+        assert_equal 'pop local 3', nodes[0].raw_text
+        assert_equal 'push constant 10', nodes[1].raw_text
       end
     end
 
-    def test_command_push
-      ProcessorTestHelper.build_with_input(
+    def test_node_instances
+      ProcessorTestHelper.process(
         'push constant 123',
-        source_location: 123,
-      ) do |object|
-        assert_instance_of Parser::Node::Push, object
-      end
-    end
-
-    def test_command_if_goto
-      ProcessorTestHelper.build_with_input(
         'if_goto A.Symbol',
-        source_location: 123,
-      ) do |object|
-        assert_instance_of Parser::Node::IfGoto, object
+      ) do |nodes|
+        assert_instance_of Parser::Node::Push, nodes[0]
+        assert_instance_of Parser::Node::IfGoto, nodes[1]
       end
     end
 
-    def test_command_invalid_command_type
-      tokens = ProcessorTestHelper.prepare_tokens(
+    def test_node_numbers
+      ProcessorTestHelper.process(
+        'push this 10',
+        'if_goto A.Symbol',
         'pop local 3',
-        source_location: 123,
-      ).tap { |tokens|
-        tokens.command_type = :an_invalid_command_type
-      }
-
-      assert_raises(Parser::InvalidCommandName) { Parser::Processor.new(tokens).build }
-    end
-
-    def test_command_invalid_operand_type
-      tokens = ProcessorTestHelper.prepare_tokens(
-        'pop local 3',
-        source_location: 123,
-      ).tap { |tokens|
-        tokens.operand_types[0] = :an_invalid_operand_type
-      }
-
-      assert_raises(InvalidOperandName) { Parser::Processor.new(tokens).build }
-    end
-
-    def test_command_invalid_argument_type
-      ProcessorTestHelper.builder_with_input(
-        'push 123 local',
-        source_location: 123,
-      ) do |builder|
-        assert_raises(InvalidOperandType) { builder.build }
+        'push local 3',
+        'return',
+      ) do |nodes|
+        assert_equal 5, nodes.size
       end
     end
   end

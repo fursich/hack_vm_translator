@@ -13,7 +13,7 @@ module Parser
       def transform
         operand_nodes = @operands.map { |operand| operand.transform }
         expression_node = constantize(last_name, base: Expression::Node)
-        expression_node.new(*operand_nodes, source_location: @source_location)
+        expression_node.new(*operand_nodes, raw_text: @raw_text, source_location: @source_location)
       end
     end
 

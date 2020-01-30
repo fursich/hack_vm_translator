@@ -1,9 +1,12 @@
 module Expression
   module Node
     class CommandBase < Base
+      attr_reader :raw_text, :source_location
       attr_reader :operands
-      def initialize(*operands, source_location:)
+
+      def initialize(*operands, raw_text:, source_location:)
         @operands        = operands
+        @raw_text        = raw_text
         @source_location = source_location
       end
 
