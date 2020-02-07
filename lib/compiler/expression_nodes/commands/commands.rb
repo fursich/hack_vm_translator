@@ -40,6 +40,6 @@ module Expression
     class IfGoto   < CommandWithSingleOperand; end
     class Function < CommandWithDoubleOperands; end
     class Call     < CommandWithDoubleOperands; end
-    class Return   < CommandWithoutOperands; end
+    class Return   < Command; end
   end
 end

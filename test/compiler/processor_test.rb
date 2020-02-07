@@ -1,6 +1,6 @@
-require_relative './test_helper'
+require 'test_helper'
 
-module Expression
+module Parser
   module ExpressionTransformerTestHelper
     def self.prepare_node(text, source_location:)
       tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize

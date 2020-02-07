@@ -8,7 +8,7 @@ require 'forwardable'
 require_relative 'utils/fileio'
 require_relative 'utils/inflector'
 require_relative 'parser/processor'
-require_relative 'expression/node/base'
+require_relative 'compiler/processor'
 
 module VMTranslator
   class Driver

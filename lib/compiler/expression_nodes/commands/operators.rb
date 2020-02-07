@@ -52,13 +52,13 @@ module Expression
     class Eq < BinaryOperator
       def operation
         <<~"ASSEMBLY".chomp
-          @aaa // **** NEED TO RETHINK UNIQUE LABEL
+          @#{new_symbol}
           D - M; JEQ
-          @bbb
+          @#{new_symbol}
           M = 0; JMP
-          (aaa)
+          (#{symbol(-1)})
           M = -1
-          (bbb)
+          (#{symbol(0)})
         ASSEMBLY
       end
     end
@@ -66,13 +66,13 @@ module Expression
     class Lt < BinaryOperator
       def operation
         <<~"ASSEMBLY".chomp
-          @aaa // **** NEED TO RETHINK UNIQUE LABEL
+          @#{new_symbol}
           D - M; JLT
-          @bbb
+          @#{new_symbol}
           M = 0; JMP
-          (aaa)
+          (#{symbol(-1)})
           M = -1
-          (bbb)
+          (#{symbol(0)})
         ASSEMBLY
       end
     end
@@ -80,13 +80,13 @@ module Expression
     class Gt < BinaryOperator
       def operation
         <<~"ASSEMBLY".chomp
-          @aaa // **** NEED TO RETHINK UNIQUE LABEL
+          @#{new_symbol}
           D - M; JGT
-          @bbb
+          @#{new_symbol}
           M = 0; JMP
-          (aaa)
+          (#{symbol(-1)})
           M = -1
-          (bbb)
+          (#{symbol(0)})
         ASSEMBLY
       end
     end
