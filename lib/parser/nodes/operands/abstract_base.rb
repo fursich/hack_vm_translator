@@ -6,24 +6,26 @@ module Parser
       end
 
       def transform
-        expression_node = constantize(last_name, base: Expression::Node)
+        expression_node = constantize(node_name, base: Expression::Node)
         expression_node.new(@value)
+      end
+
+      private
+
+      def node_name
+        self.class.name.split('::').last
       end
     end
 
     module MemorySegment
       class SegmentBase < OperandBase
         def transform
-          expression_node = constantize(last_name, base: Expression::Node::MemorySegment)
+          expression_node = constantize(node_name, base: Expression::Node::MemorySegment)
           expression_node.new(@value)
         end
 
         def type?(type)
           type == :memory_segment
-        end
-
-        def segment_name
-          self.class.name.split('::').last.downcase
         end
       end
     end

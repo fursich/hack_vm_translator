@@ -2,6 +2,7 @@ module Parser
   module Node
     class CommandBase  < Base
       attr_reader :raw_text, :source_location
+      attr_reader :operands
 
       def initialize(*operands, raw_text:, source_location:)
         @operands = operands
@@ -11,7 +12,7 @@ module Parser
       end
 
       def transform
-        operand_nodes = @operands.map { |operand| operand.transform }
+        operand_nodes = operands.map { |operand| operand.transform }
         expression_node = constantize(last_name, base: Expression::Node)
         expression_node.new(*operand_nodes, raw_text: @raw_text, source_location: @source_location)
       end
@@ -19,7 +20,7 @@ module Parser
 
     class Command < CommandBase
       def validate!
-        raise InvalidOperandSize unless @operands.size == 0
+        raise InvalidOperandSize unless operands.size == 0
       end
     end
 
@@ -28,7 +29,7 @@ module Parser
       def_delegators :@operands, :first
 
       def validate!
-        raise InvalidOperandSize unless @operands.size == 1
+        raise InvalidOperandSize unless operands.size == 1
         raise InvalidOperandType unless valid_operand_types?
       end
 
@@ -42,7 +43,7 @@ module Parser
       def_delegators :@operands, :first, :last
 
       def validate!
-        raise InvalidOperandSize unless @operands.size == 2
+        raise InvalidOperandSize unless operands.size == 2
         raise InvalidOperandType unless valid_operand_types?
       end
 
