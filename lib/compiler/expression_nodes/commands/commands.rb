@@ -21,6 +21,7 @@ module Expression
     class Pop < CommandWithDoubleOperands
       def compile
         <<~"ASSEMBLY".chomp
+          #{prepare_storage}
           @SP
           M = M - 1
           A = M
@@ -32,6 +33,11 @@ module Expression
       def store_segment
         index = @operands.last.value
         @operands.first.store(index)
+      end
+
+      def prepare_storage
+        index = @operands.last.value
+        @operands.first.prepare_storage(index)
       end
     end
 

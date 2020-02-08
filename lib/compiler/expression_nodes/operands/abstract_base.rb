@@ -14,6 +14,10 @@ module Expression
           @name = name
         end
 
+        def prepare_storage(_index)
+          # override where necessary
+        end
+
         private
         # 'screen' => 'SCREEN', 
         # 'kbd' => 'KBD', 
@@ -23,7 +27,7 @@ module Expression
           'sp'       => 'SP',
         }.merge( 13.upto(15).map { |idx| ["r#{idx}", "R#{idx}"] }.to_h )
 
-        def resolve(memory_segment, index=nil)
+        def resolve(memory_segment, index=nil) # TODO
           raise NotImplementedError
           REGISTER_ASSIGNMENT[memory_segment]
           reg_idx = REGISTER_INDEX[memory_segment] + index
@@ -76,7 +80,7 @@ module Expression
           ASSEMBLY
         end
 
-        def before_pop
+        def prepare_storage(index)
           <<~"ASSEMBLY".chomp
             #{access_indirect(index)}
             @R13
@@ -94,6 +98,7 @@ module Expression
         private
 
         def access_indirect(index) # lcl/arg/this/that
+          # FIXME: AD = はload/store両方に対応させるためのワークアラウンド
           <<~"ASSEMBLY".chomp
             @#{resolve}
             D = M

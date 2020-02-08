@@ -3,9 +3,9 @@ require 'test_helper'
 module Expression
   module ExpressionNodeTestHelper
     def self.prepare_node(text, source_location:)
-      tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize
-      parse_node = Parser::NodeFactory.new(tokens, source_location: source_location).build
-      parse_node.transform
+      source = [[source_location, text]]
+      parse_node = Parser::Processor.new(source).parse!
+      parse_node.first.transform
     end
 
     def self.node_with_input(text, source_location:, &block)
@@ -52,13 +52,14 @@ module Expression
 
     def test_command_push_this
       ExpressionNodeTestHelper.node_with_input(
-        'push this 1',
+        'push this 5',
         source_location: 3,
       ) do |node|
         assert_equal <<~"ASSEMBLY".chomp, node.compile
           @THIS
-          A = M
-          A = A + 1
+          D = M
+          @5
+          AD = D + A
           D = M
           @SP
           A = M
@@ -75,14 +76,18 @@ module Expression
         source_location: 3,
       ) do |node|
         assert_equal <<~"ASSEMBLY".chomp, node.compile
+          @ARG
+          D = M
+          @3
+          D = D + A
+          @R13
+          M = D
+
           @SP
           M = M - 1
           A = M
           D = M
-          @ARG
-          A = M
-          A = A + 1
-          A = A + 1
+          @R13
           M = D
         ASSEMBLY
       end
@@ -94,6 +99,7 @@ module Expression
         source_location: 3,
       ) do |node|
         assert_equal <<~"ASSEMBLY".chomp, node.compile
+
           @SP
           M = M - 1
           A = M
@@ -103,7 +109,6 @@ module Expression
         ASSEMBLY
       end
     end
-
 
     def test_command_add
       ExpressionNodeTestHelper.node_with_input(
@@ -121,6 +126,5 @@ module Expression
         ASSEMBLY
       end
     end
-
   end
 end
