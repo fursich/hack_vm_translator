@@ -12,7 +12,7 @@ module Inflector
   end
 
   def to_underscore(part)
-    part.gsub(/([^A-Z])([A-Z])/,'\1_\2').downcase
+    part.gsub(/([^A-Z])([A-Z])/,'\1_\2').gsub(/-/, '_').downcase
   end
 
   def to_camel(part)

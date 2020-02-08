@@ -54,7 +54,7 @@ module Parser
 
     def test_command_if_goto
       NodeFactoryTestHelper.build_with_input(
-        'if_goto A.Symbol',
+        'if-goto A.Symbol',
         source_location: 123,
       ) do |object|
         assert_instance_of Parser::Node::IfGoto, object

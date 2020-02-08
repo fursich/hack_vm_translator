@@ -22,7 +22,7 @@ module Parser
     def test_source_location
       ProcessorTestHelper.process(
         'push constant 1',
-        'if_goto A.Symbol',
+        'if-goto A.Symbol',
       ) do |nodes|
         assert_equal 1, nodes[0].source_location
         assert_equal 2, nodes[1].source_location
@@ -42,7 +42,7 @@ module Parser
     def test_node_instances
       ProcessorTestHelper.process(
         'push constant 123',
-        'if_goto A.Symbol',
+        'if-goto A.Symbol',
       ) do |nodes|
         assert_instance_of Parser::Node::Push, nodes[0]
         assert_instance_of Parser::Node::IfGoto, nodes[1]
@@ -52,7 +52,7 @@ module Parser
     def test_node_numbers
       ProcessorTestHelper.process(
         'push this 10',
-        'if_goto A.Symbol',
+        'if-goto A.Symbol',
         'pop local 3',
         'push local 3',
         'return',

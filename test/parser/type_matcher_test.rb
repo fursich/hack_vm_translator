@@ -51,7 +51,7 @@ module Parser
     end
 
     def test_valid_commands
-      valid_commands = %w(push pop add sub neg not and or eq lt gt label goto if_goto function call return)
+      valid_commands = %w(push pop add sub neg not and or eq lt gt label goto if-goto function call return)
 
       valid_commands.each do |command|
         TypeMatcherTestHelper.tokens_with_input(

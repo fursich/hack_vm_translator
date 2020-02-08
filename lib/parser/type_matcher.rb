@@ -1,7 +1,7 @@
 module Parser
   module Matchers
     TOKEN_SIZE     = 1..3
-    COMMANDS       = %w(push pop add sub neg not and or eq lt gt label goto if_goto function call return)
+    COMMANDS       = %w(push pop add sub neg not and or eq lt gt label goto if-goto function call return)
     MEMORY_SEGMENT = %w(argument local static constant this that pointer temp)
     SYMBOL         = /[a-zA-Z_\.$:][a-zA-Z0-9_\.$:]*/
     NUMBER         = /[0-9]+/
@@ -58,7 +58,7 @@ module Parser
       raise Parser::UndefinedCommandPattern, "invalid command forms with <#{@tokens.raw_text}> at line #{@tokens.source_location}"
     end
 
-    def validate_command!
+    def validate_command! # TODO: 該当行を表示する
       raise Parser::InvalidCommandName unless @tokens.command.match?(Matchers::COMMAND_MATCHER)
     end
 
