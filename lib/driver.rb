@@ -37,17 +37,10 @@ module VMTranslator
       FileIO.new(@output_filename).write(@assembly)
     end
 
-#     def compile
-#       @source.map do |source_location, text|
-#         tokens = Parser::Tokenizer.new(text, source_location: source_location).tokenize
-#         next if tokens.nil?
-#
-#         # increment_line_counter! # TODO: set line counter
-#         parse_node = Parser::NodeFactory.new(tokens, source_location: source_location).build
-#         p parse_node
-#         parse_node.transform.compile
-#       end
-#     end
+    def compile
+      parsed_source = Parser::Processor.new(@source).parse!
+      Compiler::Processor.new(parsed_source).compile
+    end
 
     def link!
       basename = @filename.basename('.*').to_s

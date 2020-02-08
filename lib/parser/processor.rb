@@ -11,12 +11,12 @@ module Parser
     end
 
     def parse!
-      @source.map do |source_location, text|
+      @source.map { |source_location, text|
         tokens = Parser::Tokenizer.new(text, source_location: source_location).tokenize
         next if tokens.nil?
         Parser::TypeMatcher.new.collate!(tokens)
         Parser::NodeFactory.new(tokens).build
-      end
+      }.compact
     end
 
     private

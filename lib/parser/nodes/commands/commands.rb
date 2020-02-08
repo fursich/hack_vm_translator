@@ -46,13 +46,13 @@ module Parser
 
     class Function < CommandWithDoubleOperands
       def valid_operand_types?
-        first.type?(:label) && last.type?(:number)
+        first.type?(:symbol) && last.type?(:number)
       end
     end
 
     class Call     < CommandWithDoubleOperands
       def valid_operand_types?
-        first.type?(:label) && last.type?(:number)
+        first.type?(:symbol) && last.type?(:number)
       end
     end
   end

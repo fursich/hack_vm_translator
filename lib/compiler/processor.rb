@@ -6,9 +6,15 @@ module Compiler
       @source = source
     end
 
-    def transform_all
+    def transform
       @source.map do |node|
         node.transform
+      end
+    end
+
+    def compile
+      transform.map do |node|
+        node.compile
       end
     end
   end
