@@ -1,59 +1,129 @@
 require 'test_helper'
 
-module Parser
-  module ExpressionTransformerTestHelper
-    def self.prepare_node(text, source_location:)
-      tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize
-      parse_node = Parser::NodeFactory.new(tokens, source_location: source_location).build
+module Compiler
+  module ProcessorTestHelper
+    def self.prepare_compiler(text, source_location:)
+      source = [[source_location, text]]
+      parsed_source = Parser::Processor.new(source).parse!
+      Compiler::Processor.new(parsed_source)
     end
 
-    def self.node_with_input(text, source_location:, &block)
-      node = prepare_node(text, source_location: source_location)
+    def self.compile_with_input(text, source_location:, &block)
+      compiler = prepare_compiler(text, source_location: source_location)
 
-      block.call node
-    end
-
-    def self.expression_with_input(text, source_location:, &block)
-      node = prepare_node(text, source_location: source_location)
-
-      block.call node.transform
+      block.call compiler.compile.first
     end
   end
 
-  class TestExpressionTransformer < Minitest::Test
-    def test_source_location
-      ExpressionTransformerTestHelper.node_with_input(
+  class TestCompilerProcessor < Minitest::Test
+    def test_command_push_constant
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'push constant 2',
+        source_location: 3,
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @2
+          D = A
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+        ASSEMBLY
+      end
+    end
+
+    def test_command_push_pointer
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'push pointer 1',
+        source_location: 3,
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @R4
+          D = M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+        ASSEMBLY
+      end
+    end
+
+    def test_command_push_this
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'push this 5',
+        source_location: 3,
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @THIS
+          D = M
+          @5
+          AD = D + A
+          D = M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+        ASSEMBLY
+      end
+    end
+
+    def test_command_pop_argument
+      Compiler::ProcessorTestHelper.compile_with_input(
         'pop argument 2',
-        source_location: 123,
-      ) do |node|
-        assert_equal 123, node.instance_eval { @source_location }
+        source_location: 3,
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @ARG
+          D = M
+          @3
+          D = D + A
+          @R13
+          M = D
+
+          @SP
+          M = M - 1
+          A = M
+          D = M
+          @R13
+          M = D
+        ASSEMBLY
       end
     end
 
-    def test_command_push
-      ExpressionTransformerTestHelper.expression_with_input(
-        'push constant 123',
-        source_location: 123,
-      ) do |expression|
-        assert_instance_of Expression::Node::Push, expression
+    def test_command_pop_temp
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'pop temp 3',
+        source_location: 3,
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+
+          @SP
+          M = M - 1
+          A = M
+          D = M
+          @R8
+          M = D
+        ASSEMBLY
       end
     end
 
-    def test_command_pop
-      ExpressionTransformerTestHelper.expression_with_input(
-        'pop this 3',
-        source_location: 123,
-      ) do |expression|
-        assert_instance_of Expression::Node::Pop, expression
-      end
-    end
-
-    def test_command_if_goto
-      ExpressionTransformerTestHelper.expression_with_input(
-        'if_goto A.Symbol',
-        source_location: 123,
-      ) do |expression|
-        assert_instance_of Expression::Node::IfGoto, expression
+    def test_command_add
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'add',
+        source_location: 3,
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @SP
+          M = M - 1
+          A = M
+          D = M
+          @SP
+          A = M - 1
+          M = D + M
+        ASSEMBLY
       end
     end
   end
