@@ -75,14 +75,14 @@ module Expression
       class IndirectReference < SegmentBase
         def load(index)
           <<~"ASSEMBLY".chomp
-            #{access_indirect(index)}
+            #{access_indirect(index, dest: 'A')}
             D = M
           ASSEMBLY
         end
 
         def prepare_storage(index)
           <<~"ASSEMBLY".chomp
-            #{access_indirect(index)}
+            #{access_indirect(index, dest: 'D')}
             @R13
             M = D
           ASSEMBLY
@@ -97,13 +97,12 @@ module Expression
 
         private
 
-        def access_indirect(index) # lcl/arg/this/that
-          # FIXME: AD = はload/store両方に対応させるためのワークアラウンド
+        def access_indirect(index, dest:) # lcl/arg/this/that
           <<~"ASSEMBLY".chomp
             @#{resolve}
             D = M
             @#{index}
-            AD = D + A
+            #{dest} = D + A
           ASSEMBLY
         end
 

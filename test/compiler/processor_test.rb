@@ -59,7 +59,7 @@ module Compiler
           @THIS
           D = M
           @5
-          AD = D + A
+          A = D + A
           D = M
           @SP
           A = M
