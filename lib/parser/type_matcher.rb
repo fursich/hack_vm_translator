@@ -58,12 +58,16 @@ module Parser
       raise Parser::UndefinedCommandPattern, "invalid command forms with <#{@tokens.raw_text}> at line #{@tokens.source_location}"
     end
 
-    def validate_command! # TODO: 該当行を表示する
-      raise Parser::InvalidCommandName unless @tokens.command.match?(Matchers::COMMAND_MATCHER)
+    def validate_command!
+      return if @tokens.command.match?(Matchers::COMMAND_MATCHER)
+
+      raise Parser::InvalidCommandName, "invalid command name detected with <#{@tokens.raw_text}> at line #{@tokens.source_location}"
     end
 
     def validate_operand_types!
-      raise Parser::InvalidOperandName unless @tokens.operands.all? {|x| x.to_s.match?(Matchers::OPERANDS_MATCHER) }
+      return if @tokens.operands.all? {|x| x.to_s.match?(Matchers::OPERANDS_MATCHER) }
+
+      raise Parser::InvalidOperandName, "invalid operand type detected with <#{@tokens.raw_text}> at line #{@tokens.source_location}"
     end
   end
 end
