@@ -1,0 +1,3 @@
+#!/bin/bash -euxC
+
+bundle exec rake run[$1]
