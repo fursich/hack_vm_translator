@@ -91,11 +91,10 @@ module Compiler
         assert_equal <<~"ASSEMBLY".chomp, output
           @ARG
           D = M
-          @3
+          @2
           D = D + A
           @R13
           M = D
-
           @SP
           M = M - 1
           A = M

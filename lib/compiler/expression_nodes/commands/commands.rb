@@ -15,8 +15,8 @@ module Expression
       private
 
       def load_segment
-        index = @operands.last.value
-        @operands.first.load(index)
+        index = operands.last.value
+        operands.first.load(index)
       end
     end
 
@@ -35,13 +35,13 @@ module Expression
       private
 
       def store_segment
-        index = @operands.last.value
-        @operands.first.store(index)
+        index = operands.last.value
+        operands.first.store(index)
       end
 
       def prepare_storage
-        index = @operands.last.value
-        @operands.first.prepare_storage(index)
+        index = operands.last.value
+        operands.first.prepare_storage(index)
       end
     end
 
@@ -55,7 +55,7 @@ module Expression
       private
 
       def label_name
-        "#{context.basename}$#{@operands.first.value}"
+        "#{context.basename}$#{operands.first.value}"
       end
     end
 
@@ -70,7 +70,7 @@ module Expression
       private
 
       def label_name
-        "#{context.basename}$#{@operands.first.value}"
+        "#{context.basename}$#{operands.first.value}"
       end
     end
 
@@ -89,7 +89,7 @@ module Expression
       private
 
       def label_name
-        "#{context.basename}$#{@operands.first.value}"
+        "#{context.basename}$#{operands.first.value}"
       end
     end
 
@@ -127,11 +127,11 @@ module Expression
       private
 
       def name
-        @operands.first.value
+        operands.first.value
       end
 
       def argc
-        @operands.last.value
+        operands.last.value
       end
 
       def local_label(symbol) # TODO: 衝突しない名前を選ぶ $$.function.label
@@ -205,11 +205,11 @@ module Expression
       private
 
       def name
-        @operands.first.value
+        operands.first.value
       end
 
       def argc
-        @operands.last.value
+        operands.last.value
       end
 
       def local_label(symbol) # TODO: 衝突しない名前を選ぶ $$.function.label
