@@ -39,7 +39,7 @@ module VMTranslator
 
     def compile
       parsed_source = Parser::Processor.new(@source).parse!
-      Compiler::Processor.new(parsed_source).compile
+      Compiler::Processor.new(parsed_source, basename: @filename.basename).compile
     end
 
     def link!

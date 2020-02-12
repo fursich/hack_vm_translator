@@ -1,16 +1,18 @@
 module Expression
   module Node
     class CommandBase < Base
+      attr_reader :context
       attr_reader :raw_text, :source_location
       attr_reader :operands
 
-      def initialize(*operands, raw_text:, source_location:)
+      def initialize(*operands, raw_text:, source_location:, context:)
         @operands        = operands
         @raw_text        = raw_text
         @source_location = source_location
+        @context         = context
       end
 
-      def compile
+      def compile(context)
         raise NotImplementedError
       end
     end

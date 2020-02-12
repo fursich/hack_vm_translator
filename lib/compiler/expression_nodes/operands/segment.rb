@@ -40,11 +40,7 @@ module Expression
         end
       end
 
-      class Static   < DirectReference
-        # FIXME
-        def resolve(index)
-          "#FILENAME#.#{index}"
-        end
+      class Static   < StaticReference
       end
     end
   end

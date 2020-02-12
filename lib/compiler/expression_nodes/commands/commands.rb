@@ -12,6 +12,8 @@ module Expression
         ASSEMBLY
       end
 
+      private
+
       def load_segment
         index = @operands.last.value
         @operands.first.load(index)
@@ -29,6 +31,8 @@ module Expression
           #{store_segment}
         ASSEMBLY
       end
+
+      private
 
       def store_segment
         index = @operands.last.value
@@ -48,8 +52,10 @@ module Expression
         ASSEMBLY
       end
 
+      private
+
       def label_name
-        @operands.first.value # FIXME: 関数名をコンテクストして持つこと（function.valueとなる）
+        "#{context.basename}$#{@operands.first.value}"
       end
     end
 
@@ -61,8 +67,10 @@ module Expression
         ASSEMBLY
       end
 
+      private
+
       def label_name
-        @operands.first.value # FIXME: 関数名をコンテクストして持つこと（function.valueとなる）
+        "#{context.basename}$#{@operands.first.value}"
       end
     end
 
@@ -78,15 +86,19 @@ module Expression
         ASSEMBLY
       end
 
+      private
+
       def label_name
-        @operands.first.value # FIXME: 関数名をコンテクストして持つこと（function.valueとなる）
+        "#{context.basename}$#{@operands.first.value}"
       end
     end
 
     class Function < CommandWithDoubleOperands
       def compile
+        context.enter!(function_name: name)
+
         <<~"ASSEMBLY".chomp
-          (#{name})
+          (#{context.function_name})
           @R15
           M = 1
 
@@ -108,9 +120,11 @@ module Expression
           M = M + 1
           @#{local_label(:loop_start)}
           0;JMP
-          {#{local_label(:loop_end)}}
+          (#{local_label(:loop_end)})
         ASSEMBLY
       end
+
+      private
 
       def name
         @operands.first.value
@@ -182,11 +196,13 @@ module Expression
           @LCL
           M = D
 
-          @#{name}
+          @#{context.function_name}
           0;JMP
           (#{local_label(:return_address)})
         ASSEMBLY
       end
+
+      private
 
       def name
         @operands.first.value

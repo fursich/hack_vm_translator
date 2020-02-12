@@ -5,9 +5,9 @@ module Parser
         @value = value
       end
 
-      def transform
+      def transform(context)
         expression_node = constantize(node_name, base: Expression::Node)
-        expression_node.new(@value)
+        expression_node.new(@value, context: context)
       end
 
       private
@@ -19,9 +19,9 @@ module Parser
 
     module MemorySegment
       class SegmentBase < OperandBase
-        def transform
+        def transform(context)
           expression_node = constantize(node_name, base: Expression::Node::MemorySegment)
-          expression_node.new(@value)
+          expression_node.new(@value, context: context)
         end
 
         def type?(type)

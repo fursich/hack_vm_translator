@@ -2,16 +2,21 @@ module Expression
   module Node
     class OperandBase < Base
       attr_reader :value
+      attr_reader :context
 
-      def initialize(value)
-        @value = value
+      def initialize(value, context:)
+        @value   = value
+        @context = context
       end
     end
 
     module MemorySegment
       class SegmentBase < OperandBase
-        def initialize(name)
+        attr_reader :context
+
+        def initialize(name, context:)
           @name = name
+          @context = context
         end
 
         def prepare_storage(_index)
@@ -62,13 +67,15 @@ module Expression
         private
 
         def access_direct(index) # pointer/temp
-          <<~"ASSEMBLY".chomp
-            @R#{resolve(index)}
-          ASSEMBLY
+          "@R#{base_index + index.to_i}"
         end
+      end
 
-        def resolve(index)
-          base_index + index.to_i
+      class StaticReference < DirectReference
+        private
+
+        def access_direct(index) # pointer/temp
+          "@#{context.basename}.#{index}"
         end
       end
 
@@ -99,15 +106,11 @@ module Expression
 
         def access_indirect(index, dest:) # lcl/arg/this/that
           <<~"ASSEMBLY".chomp
-            @#{resolve}
+            @#{base_register}
             D = M
             @#{index}
             #{dest} = D + A
           ASSEMBLY
-        end
-
-        def resolve
-          base_register
         end
       end
     end

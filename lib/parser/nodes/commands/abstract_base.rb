@@ -11,10 +11,10 @@ module Parser
         validate!
       end
 
-      def transform
-        operand_nodes = operands.map { |operand| operand.transform }
+      def transform(context)
+        operand_nodes = operands.map { |operand| operand.transform(context) }
         expression_node = constantize(last_name, base: Expression::Node)
-        expression_node.new(*operand_nodes, raw_text: @raw_text, source_location: @source_location)
+        expression_node.new(*operand_nodes, raw_text: @raw_text, source_location: @source_location, context: context)
       end
     end
 
