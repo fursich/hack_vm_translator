@@ -141,8 +141,10 @@ module Expression
 
     class Call < CommandWithDoubleOperands
       def compile
+        return_address = context.new_symbol
+
         <<~"ASSEMBLY".chomp
-          @#{local_label(:return_address)}
+          @#{return_address}
           D = A
           @SP
           A = M
@@ -198,7 +200,7 @@ module Expression
 
           @#{context.function_name}
           0;JMP
-          (#{local_label(:return_address)})
+          (#{return_address})
         ASSEMBLY
       end
 
