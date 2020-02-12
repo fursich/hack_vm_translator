@@ -26,18 +26,6 @@ module Expression
         private
         # 'screen' => 'SCREEN', 
         # 'kbd' => 'KBD', 
-        # 'static' => ?
-
-        REGISTER_ASSIGNMENT = {
-          'sp'       => 'SP',
-        }.merge( 13.upto(15).map { |idx| ["r#{idx}", "R#{idx}"] }.to_h )
-
-        def resolve(memory_segment, index=nil) # TODO
-          raise NotImplementedError
-          REGISTER_ASSIGNMENT[memory_segment]
-          reg_idx = REGISTER_INDEX[memory_segment] + index
-          "R#{reg_idx}"
-        end
       end
 
       class ImmediateValue < SegmentBase

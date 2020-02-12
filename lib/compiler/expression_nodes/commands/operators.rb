@@ -51,42 +51,51 @@ module Expression
 
     class Eq < BinaryOperator
       def operation
+        if_then = context.new_symbol
+        if_else = context.new_symbol
+
         <<~"ASSEMBLY".chomp
-          @#{new_symbol}
+          @#{if_then}
           D - M; JEQ
-          @#{new_symbol}
+          @#{if_else}
           M = 0; JMP
-          (#{symbol(-1)})
+          (#{if_then})
           M = -1
-          (#{symbol(0)})
+          (#{if_else})
         ASSEMBLY
       end
     end
 
     class Lt < BinaryOperator
       def operation
+        if_then = context.new_symbol
+        if_else = context.new_symbol
+
         <<~"ASSEMBLY".chomp
-          @#{new_symbol}
+          @#{if_then}
           D - M; JLT
-          @#{new_symbol}
+          @#{if_else}
           M = 0; JMP
-          (#{symbol(-1)})
+          (#{if_then})
           M = -1
-          (#{symbol(0)})
+          (#{if_else})
         ASSEMBLY
       end
     end
 
     class Gt < BinaryOperator
       def operation
+        if_then = context.new_symbol
+        if_else = context.new_symbol
+
         <<~"ASSEMBLY".chomp
-          @#{new_symbol}
+          @#{if_then}
           D - M; JGT
-          @#{new_symbol}
+          @#{if_else}
           M = 0; JMP
-          (#{symbol(-1)})
+          (#{if_then})
           M = -1
-          (#{symbol(0)})
+          (#{if_else})
         ASSEMBLY
       end
     end
