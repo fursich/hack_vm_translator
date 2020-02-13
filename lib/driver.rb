@@ -44,8 +44,7 @@ module VMTranslator
 
     def link!
       basename = @filename.basename('.*').to_s
-      puts basename
-      @assembly.gsub!('#FILENAME#', basename)
+      puts "compiled: #{basename}"
     end
 
     def print
