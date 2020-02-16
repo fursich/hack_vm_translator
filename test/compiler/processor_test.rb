@@ -289,12 +289,12 @@ module Compiler
           @5
           D = D + A
           @SP
-          D = A - D
+          D = M - D
           @ARG
           M = D
 
           @SP
-          D = A
+          D = M
           @LCL
           M = D
 
@@ -315,6 +315,8 @@ module Compiler
           @R15
           M = D
 
+          @LCL
+          D = M
           @5
           A = D - A
           D = M
@@ -326,12 +328,13 @@ module Compiler
           A = M
           D = M
           @ARG
+          A = M
           M = D
 
           @ARG
           D = M
           @SP
-          M = D
+          M = D + 1
 
           @R15
           M = M - 1
@@ -362,6 +365,7 @@ module Compiler
           M = D
 
           @R14
+          A = M
           0;JMP
         ASSEMBLY
       end
