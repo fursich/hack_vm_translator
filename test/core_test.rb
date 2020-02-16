@@ -156,6 +156,7 @@ module VMTranslator
           A = M
           D = M
           @R13
+          A = M
           M = D
         ASSEMBLY
       end

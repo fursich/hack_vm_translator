@@ -94,6 +94,7 @@ module Expression
         def store(index) # lcl/arg/this/that
           <<~"ASSEMBLY".chomp
             @R13
+            A = M
             M = D
           ASSEMBLY
         end
