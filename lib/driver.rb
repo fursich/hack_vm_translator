@@ -7,8 +7,7 @@ require 'forwardable'
 
 require_relative 'utils/fileio'
 require_relative 'utils/inflector'
-require_relative 'parser/processor'
-require_relative 'compiler/processor'
+require_relative 'core'
 
 module VMTranslator
   class Driver
@@ -24,7 +23,6 @@ module VMTranslator
 
     def run
       @assembly = compile.join("\n")
-      link!
       print
       write_file
     end
@@ -42,13 +40,11 @@ module VMTranslator
       Compiler::Processor.new(parsed_source, basename: @filename.basename).compile
     end
 
-    def link!
+    def print
       basename = @filename.basename('.*').to_s
       puts "compiled: #{basename}"
-    end
-
-    def print
       puts @assembly
+      puts
     end
   end
 end
