@@ -4,11 +4,16 @@ module Parser
     COMMANDS       = %w(push pop add sub neg not and or eq lt gt label goto if-goto function call return)
     MEMORY_SEGMENT = %w(argument local static constant this that pointer temp)
     SYMBOL         = /[a-zA-Z_\.$:][a-zA-Z0-9_\.$:]*/
+    RESERVED_LABEL = /(keyboard|screen|stack|heap)/
     NUMBER         = /[0-9]+/
 
     COMMAND_MATCHER         = /\A#{Regexp.union(COMMANDS.map{|com| Regexp.new(com)})}\z/
     MEMORY_SEGMENTS_MATCHER = /\A#{Regexp.union(*MEMORY_SEGMENT)}\z/
-    OPERANDS_MATCHER        = /\A#{Regexp.union(MEMORY_SEGMENTS_MATCHER, SYMBOL, NUMBER)}\z/
+    OPERANDS_MATCHER        = /\A#{Regexp.union(MEMORY_SEGMENTS_MATCHER, SYMBOL, RESERVED_LABEL, NUMBER)}\z/
+
+    NUMBER_MATCHER          = /\A#{NUMBER}\z/
+    RESERVED_LABEL_MATHCER  = /\A#{RESERVED_LABEL}\z/
+    SYMBOL_MATCHER          = /\A#{SYMBOL}\z/
   end
 
   class TypeMatcher
@@ -36,9 +41,12 @@ module Parser
         case operand
         when Matchers::MEMORY_SEGMENTS_MATCHER
           :"memory_segment/#{operand}"
-        when Matchers::SYMBOL
+        when Matchers::RESERVED_LABEL_MATHCER
+          # need to resolve prior to symbol type
+          :reserved_label
+        when Matchers::SYMBOL_MATCHER
           :symbol
-        when Matchers::NUMBER
+        when Matchers::NUMBER_MATCHER
           :number
         else
           raise ParseError, 'unknown operand type detected' # should have been validated beforehand

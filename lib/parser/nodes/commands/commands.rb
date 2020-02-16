@@ -34,13 +34,21 @@ module Parser
 
     class Push     < CommandWithDoubleOperands
       def valid_operand_types?
-        first.type?(:memory_segment) && last.type?(:number)
+        if first.type?(:constant)
+          last.type?(:number) || last.type?(:reserved_label)
+        elsif first.type?(:memory_segment)
+          last.type?(:number)
+        end
       end
     end
 
     class Pop      < CommandWithDoubleOperands
       def valid_operand_types?
-        first.type?(:memory_segment) && last.type?(:number)
+        if first.type?(:constant)
+          last.type?(:number) || last.type?(:reserved_label)
+        elsif first.type?(:memory_segment)
+          last.type?(:number)
+        end
       end
     end
 

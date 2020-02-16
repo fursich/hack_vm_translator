@@ -7,8 +7,12 @@ module Parser
       class That     < SegmentBase; end
       class Pointer  < SegmentBase; end
       class Temp     < SegmentBase; end
-      class Constant < SegmentBase; end
       class Static   < SegmentBase; end
+      class Constant < SegmentBase
+        def type?(type)
+          type == :constant
+        end
+      end
     end
   end
 end

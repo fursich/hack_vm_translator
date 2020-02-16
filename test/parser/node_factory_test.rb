@@ -45,7 +45,7 @@ module Parser
 
     def test_command_push
       NodeFactoryTestHelper.build_with_input(
-        'push constant 123',
+        'push temp 123',
         source_location: 123,
       ) do |object|
         assert_instance_of Parser::Node::Push, object
@@ -58,6 +58,36 @@ module Parser
         source_location: 123,
       ) do |object|
         assert_instance_of Parser::Node::IfGoto, object
+      end
+    end
+
+    def test_memory_segments_with_numbers
+      memory_segments = %w(argument local static constant this that pointer temp)
+
+      memory_segments.each do |memory_segment|
+        NodeFactoryTestHelper.build_with_input(
+          "pop #{memory_segment} 555",
+          source_location: 123,
+        ) do |object|
+          assert_instance_of Parser::Node::Pop, object
+          assert_kind_of Parser::Node::MemorySegment::SegmentBase, object.first
+          assert_instance_of Parser::Node::Number, object.last
+        end
+      end
+    end
+
+    def test_constant_with_reserved_labels
+      reserved_labels = %w(stack heap screen keyboard)
+
+      reserved_labels.each do |reserved_label|
+        NodeFactoryTestHelper.build_with_input(
+          "push constant #{reserved_label}",
+          source_location: 123,
+        ) do |object|
+          assert_instance_of Parser::Node::Push, object
+          assert_instance_of Parser::Node::MemorySegment::Constant, object.first
+          assert_instance_of Parser::Node::ReservedLabel, object.last
+        end
       end
     end
 
@@ -95,6 +125,20 @@ module Parser
     def test_command_invalid_argument_type
       NodeFactoryTestHelper.builder_with_input(
         'push 123 local',
+        source_location: 123,
+      ) do |builder|
+        assert_raises(InvalidOperandType) { builder.build }
+      end
+
+      NodeFactoryTestHelper.builder_with_input(
+        'push static screen',
+        source_location: 123,
+      ) do |builder|
+        assert_raises(InvalidOperandType) { builder.build }
+      end
+
+      NodeFactoryTestHelper.builder_with_input(
+        'push constant SCREEN',
         source_location: 123,
       ) do |builder|
         assert_raises(InvalidOperandType) { builder.build }

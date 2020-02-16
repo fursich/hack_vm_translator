@@ -106,6 +106,76 @@ module Parser
     end
 
     def test_command_with_two_operands
+      TypeMatcherTestHelper.tokens_with_input(
+       "push static 10",
+        source_location: 123,
+      ) do |tokens|
+        assert_instance_of TokenCollection, tokens
+        assert_equal 3, tokens.size
+        assert_equal :push, tokens.command_type
+        assert_equal [:'memory_segment/static', :number], tokens.operand_types
+      end
+    end
+
+    def test_command_with_three_or_more_operands
+      tokens = TypeMatcherTestHelper.tokenize(
+        'pop local 3 1',
+        source_location: 123,
+      )
+      assert_raises(Parser::UndefinedCommandPattern) {
+        Parser::TypeMatcher.new.collate!(tokens)
+      }
+    end
+
+    def test_reserved_labels
+      reserved_labels = %w(stack heap screen keyboard)
+
+      reserved_labels.each do |label|
+        TypeMatcherTestHelper.tokens_with_input(
+         "push constant #{label}",
+          source_location: 123,
+        ) do |tokens|
+          assert_instance_of TokenCollection, tokens
+          assert_equal 3, tokens.size
+          assert_equal :push, tokens.command_type
+          assert_equal [:"memory_segment/constant", :reserved_label], tokens.operand_types
+        end
+      end
+    end
+
+    def test_numbers
+      numbers = (0..10).to_a
+
+      numbers.each do |number|
+        TypeMatcherTestHelper.tokens_with_input(
+         "pop local #{number}",
+          source_location: 123,
+        ) do |tokens|
+          assert_instance_of TokenCollection, tokens
+          assert_equal 3, tokens.size
+          assert_equal :pop, tokens.command_type
+          assert_equal [:"memory_segment/local", :number], tokens.operand_types
+        end
+      end
+    end
+
+    def test_symbols
+      symbols = %w($foo Bar.baz label1 stack0)
+
+      symbols.each do |number|
+        TypeMatcherTestHelper.tokens_with_input(
+         "pop local #{number}",
+          source_location: 123,
+        ) do |tokens|
+          assert_instance_of TokenCollection, tokens
+          assert_equal 3, tokens.size
+          assert_equal :pop, tokens.command_type
+          assert_equal [:"memory_segment/local", :symbol], tokens.operand_types
+        end
+      end
+    end
+
+    def test_memory_segments
       valid_segments = %w(argument local static constant this that pointer temp)
 
       valid_segments.each do |segment|
@@ -119,16 +189,6 @@ module Parser
           assert_equal [:"memory_segment/#{segment}", :number], tokens.operand_types
         end
       end
-    end
-
-    def test_command_with_three_or_more_operands
-      tokens = TypeMatcherTestHelper.tokenize(
-        'pop local 3 1',
-        source_location: 123,
-      )
-      assert_raises(Parser::UndefinedCommandPattern) {
-        Parser::TypeMatcher.new.collate!(tokens)
-      }
     end
   end
 end
