@@ -236,6 +236,8 @@ module Expression
           @R15
           M = D
 
+          @LCL
+          D = M
           @5
           A = D - A
           D = M
@@ -247,12 +249,13 @@ module Expression
           A = M
           D = M
           @ARG
+          A = M
           M = D
 
           @ARG
           D = M
           @SP
-          M = D
+          M = D + 1
 
           @R15
           M = M - 1
@@ -283,6 +286,7 @@ module Expression
           M = D
 
           @R14
+          A = M
           0;JMP
         ASSEMBLY
       end
