@@ -25,8 +25,11 @@ module Expression
       def compile
         <<~"ASSEMBLY".chomp
           @SP
-          A = M - 1
+          M = M - 1
+          A = M
           #{operation}
+          @SP
+          M = M + 1
         ASSEMBLY
       end
     end
@@ -38,9 +41,19 @@ module Expression
           M = M - 1
           A = M
           D = M
+          @R15
+          M = D
           @SP
-          A = M - 1
+          M = M - 1
+          A = M
+          D = M
+          @R15
           #{operation}
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
         ASSEMBLY
       end
     end

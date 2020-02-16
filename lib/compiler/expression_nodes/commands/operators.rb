@@ -19,7 +19,7 @@ module Expression
     class And < BinaryOperator
       def operation
         <<~"ASSEMBLY".chomp
-          M = D & M
+          D = D & M
         ASSEMBLY
       end
     end
@@ -27,7 +27,7 @@ module Expression
     class Or < BinaryOperator
       def operation
         <<~"ASSEMBLY".chomp
-          M = D | M
+          D = D | M
         ASSEMBLY
       end
     end
@@ -36,7 +36,7 @@ module Expression
     class Add < BinaryOperator
       def operation
         <<~"ASSEMBLY".chomp
-          M = D + M
+          D = D + M
         ASSEMBLY
       end
     end
@@ -44,7 +44,7 @@ module Expression
     class Sub < BinaryOperator
       def operation
         <<~"ASSEMBLY".chomp
-          M = D - M
+          D = D - M
         ASSEMBLY
       end
     end
@@ -55,12 +55,13 @@ module Expression
         if_else = context.new_symbol
 
         <<~"ASSEMBLY".chomp
+          D = D - M
           @#{if_then}
-          D - M; JEQ
+          D; JEQ
           @#{if_else}
-          M = 0; JMP
+          D = 0; JMP
           (#{if_then})
-          M = -1
+          D = -1
           (#{if_else})
         ASSEMBLY
       end
@@ -72,12 +73,13 @@ module Expression
         if_else = context.new_symbol
 
         <<~"ASSEMBLY".chomp
+          D = D - M
           @#{if_then}
-          D - M; JLT
+          D; JLT
           @#{if_else}
-          M = 0; JMP
+          D = 0; JMP
           (#{if_then})
-          M = -1
+          D = -1
           (#{if_else})
         ASSEMBLY
       end
@@ -89,12 +91,13 @@ module Expression
         if_else = context.new_symbol
 
         <<~"ASSEMBLY".chomp
+          D = D - M
           @#{if_then}
-          D - M; JGT
+          D; JGT
           @#{if_else}
-          M = 0; JMP
+          D = 0; JMP
           (#{if_then})
-          M = -1
+          D = -1
           (#{if_else})
         ASSEMBLY
       end

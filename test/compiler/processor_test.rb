@@ -188,9 +188,19 @@ module Compiler
           M = M - 1
           A = M
           D = M
+          @R15
+          M = D
           @SP
-          A = M - 1
-          M = D + M
+          M = M - 1
+          A = M
+          D = M
+          @R15
+          D = D + M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
         ASSEMBLY
       end
     end

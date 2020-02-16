@@ -192,18 +192,28 @@ module VMTranslator
       end
     end
 
-    def test_command_add
+    def test_command_sub
       VMTranslator::CoreHelper.process_with_input(
-        'add',
+        'sub',
       ) do |output|
         assert_equal <<~"ASSEMBLY".chomp, output
           @SP
           M = M - 1
           A = M
           D = M
+          @R15
+          M = D
           @SP
-          A = M - 1
-          M = D + M
+          M = M - 1
+          A = M
+          D = M
+          @R15
+          D = D - M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
         ASSEMBLY
       end
     end
@@ -242,9 +252,19 @@ module VMTranslator
           M = M - 1
           A = M
           D = M
+          @R15
+          M = D
           @SP
-          A = M - 1
-          M = D + M
+          M = M - 1
+          A = M
+          D = M
+          @R15
+          D = D + M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
           @SP
           M = M - 1
           A = M
