@@ -14,6 +14,8 @@ module Parser
 
     def build
       command_node_class.new(*operand_nodes, raw_text: raw_text, source_location: source_location)
+    rescue InvalidOperandSize, InvalidOperandType => e
+      raise e, e.message + " with file #{@basename}.vm"
     end
 
     private
@@ -21,13 +23,13 @@ module Parser
     def command_node_class
       constantize(command_type, base: Parser::Node)
     rescue NameError => e
-      raise InvalidCommandName, "invalid command name: \'#{command_type}\' at line #{source_location} \n(originally reported as: #{e.class}: #{e.message})"
+      raise InvalidCommandName, "invalid command name: \'#{command_type}\' at line #{source_location} with file #{@basename}.vm \n(originally reported as: #{e.class}: #{e.message})"
     end
 
     def operand_nodes
       operand_types.zip(operands).map { |type, value| constantize(type, base: Parser::Node).new(value) }
     rescue NameError => e
-      raise InvalidOperandName, "invalid operand type(s): \'#{operands.join(' ')}\' at line #{source_location} \n(originally reported as: #{e.class}: #{e.message})"
+      raise InvalidOperandName, "invalid operand type(s): \'#{operands.join(' ')}\' at line #{source_location} with file #{@basename}.vm \n(originally reported as: #{e.class}: #{e.message})"
     end
   end
 end

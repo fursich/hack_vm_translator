@@ -16,11 +16,25 @@ module Parser
         expression_node = constantize(last_name, base: Expression::Node)
         expression_node.new(*operand_nodes, raw_text: @raw_text, source_location: @source_location, context: context)
       end
+
+      private
+
+      def validate_oprand_size!(expected:)
+        unless operands.size == expected
+          raise InvalidOperandSize, "invalid operand size: #{operands.size} (expected: #{expected}) at line #{source_location}"
+        end
+      end
+
+      def validate_oprand_types!
+        unless valid_operand_types?
+          raise InvalidOperandType, "invalid operand type: #{operands} at line #{source_location}"
+        end
+      end
     end
 
     class Command < CommandBase
       def validate!
-        raise InvalidOperandSize unless operands.size == 0
+        validate_oprand_size!(expected: 0)
       end
     end
 
@@ -29,8 +43,8 @@ module Parser
       def_delegators :@operands, :first
 
       def validate!
-        raise InvalidOperandSize unless operands.size == 1
-        raise InvalidOperandType unless valid_operand_types?
+        validate_oprand_size!(expected: 1)
+        validate_oprand_types!
       end
 
       def valid_operand_types?
@@ -43,8 +57,8 @@ module Parser
       def_delegators :@operands, :first, :last
 
       def validate!
-        raise InvalidOperandSize unless operands.size == 2
-        raise InvalidOperandType unless valid_operand_types?
+        validate_oprand_size!(expected: 2)
+        validate_oprand_types!
       end
 
       def valid_operand_types?

@@ -64,19 +64,19 @@ module Parser
     def validate_operand_size!
       return if Matchers::TOKEN_SIZE.include? @tokens.size
 
-      raise Parser::UndefinedCommandPattern, "invalid command forms with <#{@tokens.raw_text}> at line #{@tokens.source_location}"
+      raise Parser::UndefinedCommandPattern, "invalid command forms with <#{@tokens.raw_text}> at line #{@tokens.source_location} with file #{@basename}.vm"
     end
 
     def validate_command!
       return if @tokens.command.match?(Matchers::COMMAND_MATCHER)
 
-      raise Parser::InvalidCommandName, "invalid command name detected with <#{@tokens.raw_text}> at line #{@tokens.source_location}"
+      raise Parser::InvalidCommandName, "invalid command name detected with <#{@tokens.raw_text}> at line #{@tokens.source_location} with file #{@basename}.vm"
     end
 
     def validate_operand_types!
       return if @tokens.operands.all? {|x| x.to_s.match?(Matchers::OPERANDS_MATCHER) }
 
-      raise Parser::InvalidOperandName, "invalid operand type detected with <#{@tokens.raw_text}> at line #{@tokens.source_location}"
+      raise Parser::InvalidOperandName, "invalid operand type detected with <#{@tokens.raw_text}> at line #{@tokens.source_location} with file #{@basename}.vm"
     end
   end
 end
