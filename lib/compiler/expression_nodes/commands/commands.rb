@@ -22,14 +22,15 @@ module Expression
 
     class Pop < CommandWithDoubleOperands
       def compile
-        <<~"ASSEMBLY".chomp
-          #{prepare_storage}
-          @SP
-          M = M - 1
-          A = M
-          D = M
-          #{store_segment}
-        ASSEMBLY
+        prepare_storage_if_necessary(
+          <<~"ASSEMBLY".chomp
+            @SP
+            M = M - 1
+            A = M
+            D = M
+            #{store_segment}
+          ASSEMBLY
+        )
       end
 
       private
@@ -37,6 +38,14 @@ module Expression
       def store_segment
         index = operands.last.value
         operands.first.store(index)
+      end
+
+      def prepare_storage_if_necessary(str)
+        if (preparation = prepare_storage)
+          [preparation, str].join("\n")
+        else
+          str
+        end
       end
 
       def prepare_storage

@@ -153,7 +153,6 @@ module Compiler
         'pop temp 3',
       ) do |output|
         assert_equal <<~"ASSEMBLY".chomp, output
-
           @SP
           M = M - 1
           A = M
@@ -170,7 +169,6 @@ module Compiler
         basename: 'basename',
       ) do |output|
         assert_equal <<~"ASSEMBLY".chomp, output
-
           @SP
           M = M - 1
           A = M
