@@ -83,17 +83,18 @@ module VMTranslator
       end
 
       pathname = Pathname.new(path)
-      @output_filename = Pathname.pwd.join pathname.basename.sub_ext('.asm')
 
       if pathname.directory?
         @compilation_mode = :integrated
         @input_filenames = pathname.glob('*.vm')
+        @output_filename = pathname.join(pathname.basename.sub_ext('.asm'))
 
         validate_file_structure_with_integrated_mode!
       else
         @compilation_mode = :single_file
         raise FileError, 'illegal file type' if pathname.extname != '.vm'
         @input_filenames = [pathname]
+        @output_filename = pathname.sub_ext('.asm')
       end
     end
 
