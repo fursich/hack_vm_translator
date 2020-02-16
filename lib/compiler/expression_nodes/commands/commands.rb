@@ -64,7 +64,7 @@ module Expression
       private
 
       def label_name
-        "#{context.basename}$#{operands.first.value}"
+        "#{context.function_name}$#{operands.first.value}"
       end
     end
 
@@ -79,7 +79,7 @@ module Expression
       private
 
       def label_name
-        "#{context.basename}$#{operands.first.value}"
+        "#{context.function_name}$#{operands.first.value}"
       end
     end
 
@@ -98,7 +98,7 @@ module Expression
       private
 
       def label_name
-        "#{context.basename}$#{operands.first.value}"
+        "#{context.function_name}$#{operands.first.value}"
       end
     end
 
@@ -107,11 +107,11 @@ module Expression
         context.enter!(function_name: name)
 
         <<~"ASSEMBLY".chomp
-          (#{context.function_name})
+          (#{name})
           @R15
           M = 1
 
-          {#{local_label(:loop_start)}}
+          (#{local_label(:loop_start)})
           @R15
           D = M
           @#{argc}
@@ -207,7 +207,7 @@ module Expression
           @LCL
           M = D
 
-          @#{context.function_name}
+          @#{name}
           0;JMP
           (#{return_address})
         ASSEMBLY
@@ -227,6 +227,7 @@ module Expression
         "$$.#{name}.#{symbol}"
       end
     end
+
     class Return < Command
       def compile
         <<~"ASSEMBLY".chomp

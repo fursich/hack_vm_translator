@@ -21,6 +21,7 @@ module VMTranslator
       expand_filenames!(path)
       raw_sources   = retrive_sources
       @sources      = format_sources(raw_sources)
+      append_init_caller!
     end
 
     def run
@@ -44,6 +45,16 @@ module VMTranslator
         numbered_source = raw_source.split(/\r?\n/).map.with_index(2){ |code, lineno| [lineno, code] }
         [basename, numbered_source]
       }
+    end
+
+    def append_init_caller!
+      @sources.unshift(
+        ['__bootstrap_codes__',
+          [
+            [1, 'call Sys.init 0']
+          ]
+        ]
+      )
     end
 
     def read_from_file(filename)

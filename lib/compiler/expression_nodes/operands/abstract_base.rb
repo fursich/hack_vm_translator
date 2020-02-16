@@ -30,10 +30,17 @@ module Expression
       end
 
       class ImmediateValue < SegmentBase
-        def load(index)
+        def load(addr)
           <<~"ASSEMBLY".chomp
-            @#{index}
+            @#{addr}
             D = A
+          ASSEMBLY
+        end
+
+        def store(addr) # pointer/temp
+          <<~"ASSEMBLY".chomp
+            @#{addr}
+            M = D
           ASSEMBLY
         end
       end

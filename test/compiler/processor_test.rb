@@ -2,14 +2,14 @@ require 'test_helper'
 
 module Compiler
   module ProcessorTestHelper
-    def self.prepare_compiler(text, source_location:, basename:)
+    def self.prepare_processor(text, source_location:, basename:)
       source = [[source_location, text]]
       parsed_source = Parser::Processor.new(source, basename: basename).parse!
       Compiler::Processor.new(parsed_source, basename: basename)
     end
 
     def self.compile_with_input(text, source_location: 1, basename: 'basename', &block)
-      compiler = prepare_compiler(text, source_location: source_location, basename: basename)
+      compiler = prepare_processor(text, source_location: source_location, basename: basename)
 
       block.call compiler.compile.first
     end
@@ -193,6 +193,218 @@ module Compiler
           M = D + M
         ASSEMBLY
       end
+    end
+
+    def test_command_function
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'function foo 2',
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          (foo)
+          @R15
+          M = 1
+
+          ($$.foo.loop_start)
+          @R15
+          D = M
+          @2
+          D = D - A
+          @$$.foo.loop_end
+          D;JGT
+
+          @SP
+          A = M
+          M = 0
+          @SP
+          M = M + 1
+
+          @R15
+          M = M + 1
+          @$$.foo.loop_start
+          0;JMP
+          ($$.foo.loop_end)
+        ASSEMBLY
+      end
+    end
+
+    def test_command_call
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'call foobar 2',
+        basename: 'basename'
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @$.local.basename.1
+          D = A
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+
+          @LCL
+          D = M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+
+          @ARG
+          D = M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+
+          @THIS
+          D = M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+
+          @THAT
+          D = M
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+
+          @2
+          D = A
+          @5
+          D = D + A
+          @SP
+          D = A - D
+          @ARG
+          M = D
+
+          @SP
+          D = A
+          @LCL
+          M = D
+
+          @foobar
+          0;JMP
+          ($.local.basename.1)
+        ASSEMBLY
+      end
+    end
+
+    def test_command_return
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'return'
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @LCL
+          D = M
+          @R15
+          M = D
+
+          @5
+          A = D - A
+          D = M
+          @R14
+          M = D
+
+          @SP
+          M = M - 1
+          A = M
+          D = M
+          @ARG
+          M = D
+
+          @ARG
+          D = M
+          @SP
+          M = D
+
+          @R15
+          M = M - 1
+          A = M
+          D = M
+          @THAT
+          M = D
+
+          @R15
+          M = M - 1
+          A = M
+          D = M
+          @THIS
+          M = D
+
+          @R15
+          M = M - 1
+          A = M
+          D = M
+          @ARG
+          M = D
+
+          @R15
+          M = M - 1
+          A = M
+          D = M
+          @LCL
+          M = D
+
+          @R14
+          0;JMP
+        ASSEMBLY
+      end
+    end
+
+    def test_label
+      processor = Compiler::ProcessorTestHelper.prepare_processor(
+        'label foo',
+        source_location: 123,
+        basename: 'basename'
+      )
+
+      context = processor.instance_variable_get(:@transformer).context
+      context.instance_variable_set(:@function_name, 'a_function')
+
+      assert_equal <<~ASSEMBLY.chomp, processor.compile.first
+        (a_function$foo)
+      ASSEMBLY
+    end
+
+    def test_goto
+      processor = Compiler::ProcessorTestHelper.prepare_processor(
+        'goto foo',
+        source_location: 123,
+        basename: 'basename'
+      )
+
+      context = processor.instance_variable_get(:@transformer).context
+      context.instance_variable_set(:@function_name, 'a_function')
+
+      assert_equal <<~ASSEMBLY.chomp, processor.compile.first
+        @a_function$foo
+        0;JMP
+      ASSEMBLY
+    end
+
+    def test_if_goto
+      processor = Compiler::ProcessorTestHelper.prepare_processor(
+        'if-goto foo',
+        source_location: 123,
+        basename: 'basename'
+      )
+
+      context = processor.instance_variable_get(:@transformer).context
+      context.instance_variable_set(:@function_name, 'a_function')
+
+      assert_equal <<~ASSEMBLY.chomp, processor.compile.first
+        @SP
+        M = M - 1
+        A = M
+        D = M
+        @a_function$foo
+        D;JNE
+      ASSEMBLY
     end
   end
 end

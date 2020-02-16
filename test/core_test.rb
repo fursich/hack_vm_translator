@@ -46,8 +46,15 @@ module VMTranslator
     end
 
     def test_command_push_constant
+      source = <<~SOURCE
+        push constant stack
+        pop  constant screen
+        push constant keyboard
+        push constant heap
+      SOURCE
+
       VMTranslator::CoreHelper.process_with_input(
-        'push constant stack',
+        source
       ) do |output|
         assert_equal <<~"ASSEMBLY".chomp, output
           @256
@@ -57,43 +64,20 @@ module VMTranslator
           M = D
           @SP
           M = M + 1
-        ASSEMBLY
-      end
-
-      VMTranslator::CoreHelper.process_with_input(
-        'push constant heap',
-      ) do |output|
-        assert_equal <<~"ASSEMBLY".chomp, output
-          @2048
-          D = A
           @SP
+          M = M - 1
           A = M
-          M = D
-          @SP
-          M = M + 1
-        ASSEMBLY
-      end
-
-      VMTranslator::CoreHelper.process_with_input(
-        'push constant screen',
-      ) do |output|
-        assert_equal <<~"ASSEMBLY".chomp, output
+          D = M
           @SCREEN
+          M = D
+          @KBD
           D = A
           @SP
           A = M
           M = D
           @SP
           M = M + 1
-        ASSEMBLY
-      end
-
-
-      VMTranslator::CoreHelper.process_with_input(
-        'push constant keyboard',
-      ) do |output|
-        assert_equal <<~"ASSEMBLY".chomp, output
-          @KBD
+          @2048
           D = A
           @SP
           A = M
