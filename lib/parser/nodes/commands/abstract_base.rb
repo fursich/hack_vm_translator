@@ -8,7 +8,6 @@ module Parser
         @operands        = operands
         @raw_text        = raw_text
         @source_location = source_location
-        validate!
       end
 
       def transform(context)

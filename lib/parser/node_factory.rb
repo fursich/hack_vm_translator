@@ -13,7 +13,7 @@ module Parser
     end
 
     def build
-      command_node_class.new(*operand_nodes, raw_text: raw_text, source_location: source_location)
+      command_node_class.new(*operand_nodes, raw_text: raw_text, source_location: source_location).tap(&:validate!)
     rescue InvalidOperandSize, InvalidOperandType => e
       raise e, e.message + " with file #{@basename}.vm"
     end
