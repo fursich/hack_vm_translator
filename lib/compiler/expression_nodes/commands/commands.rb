@@ -198,12 +198,12 @@ module Expression
           @5
           D = D + A
           @SP
-          D = A - D
+          D = M - D
           @ARG
           M = D
 
           @SP
-          D = A
+          D = M
           @LCL
           M = D
 
