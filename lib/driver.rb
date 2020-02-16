@@ -7,44 +7,69 @@ require 'forwardable'
 
 require_relative 'utils/fileio'
 require_relative 'utils/inflector'
+require_relative 'errors'
 require_relative 'core'
 
 module VMTranslator
   class Driver
-    attr_reader :source, :commands, :symbols
+    attr_reader :sources
 
-    def initialize(filename)
-      @filename = Pathname.new(filename)
-      raise FileError, 'illegal file type' if @filename.extname != '.vm'
-      @output_filename = @filename.sub_ext('.asm')
+    def initialize(path, debug: false)
+      @debug = debug
 
-      @source = read_file
+      expand_filenames!(path)
+      @sources = retrive_sources
     end
 
     def run
-      @assembly = compile.join("\n")
-      print
-      write_file
+      assembly = @sources.map { |basename, source|
+        VMTranslator::Core.new(source, basename: basename, debug: @debug).process
+      }.join("\n")
+
+      write_file(assembly, filename: @output_filename)
     end
 
-    def read_file
-      FileIO.new(@filename).read
+    private
+
+    def retrive_sources
+      @input_filenames.map do |filename|
+        [filename.basename, read_from_file(filename)]
+      end
     end
 
-    def write_file
-      FileIO.new(@output_filename).write(@assembly)
+    def read_from_file(filename)
+      FileIO.new(filename).read
     end
 
-    def compile
-      parsed_source = Parser::Processor.new(@source).parse!
-      Compiler::Processor.new(parsed_source, basename: @filename.basename).compile
+    def write_file(assembly, filename:)
+      FileIO.new(filename).write(assembly)
     end
 
-    def print
-      basename = @filename.basename('.*').to_s
-      puts "compiled: #{basename}"
-      puts @assembly
-      puts
+    def expand_filenames!(path)
+      unless path && File.exist?(path)
+        raise FileError, 'please specify valid path of a *.vm file, or a directory including *.vm file(s))'
+      end
+
+      pathname = Pathname.new(path)
+      @output_filename = Pathname.pwd.join pathname.basename.sub_ext('.asm')
+
+      if pathname.directory?
+        @compilation_mode = :integrated
+        @input_filenames = pathname.glob('*.vm')
+
+        validate_file_structure_with_integrated_mode!
+      else
+        @compilation_mode = :single_file
+        raise FileError, 'illegal file type' if pathname.extname != '.vm'
+        @input_filenames = [pathname]
+      end
+    end
+
+    def validate_file_structure_with_integrated_mode!
+      return unless @compilation_mode == :integrated
+
+      raise FileError, 'no vm file(s) found in the directory' if @input_filenames.empty?
+      raise FileError, 'cannot find Sys.vm in the directory' unless @input_filenames.one?('Sys')
     end
   end
 end

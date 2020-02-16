@@ -1,7 +1,4 @@
 module VMTranslator
-  class Error < StandardError; end
-  class FileError < Error; end
-
   class FileIO
     def initialize(filename)
       @filename = filename

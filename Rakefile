@@ -1,4 +1,5 @@
 require "rake/testtask"
+require 'pry'
 require_relative 'lib/driver'
 
 Rake::TestTask.new(:test) do |t|
@@ -14,16 +15,31 @@ task :run, [:filename] do |_task, args|
 end
 
 task :parse, [:filename] do |_task, args|
-  source = VMTranslator::Driver.new(args.filename).source
-  parsed = Parser::Processor.new(source).parse!
-  parsed.each do |tree|
-    p tree
+  sources = VMTranslator::Driver.new(args.filename).sources
+
+  sources.each do |basename, source|
+    parsed = Parser::Processor.new(source).parse!
+
+    puts "<<file: #{basename}>>"
+    parsed.each do |node|
+      puts "  NODE: #{node.class}:#{node.object_id}"
+      node.operands.each do |operand|
+        puts "    - #{operand.inspect}"
+      end
+    end
+    puts
   end
 end
 
-task :compile, [:filename] do |_task, args|
-  compiled = VMTranslator::Driver.new(args.filename).compile
-  compiled.each do |tree|
-    puts tree
+task :compile, [:filename, :debug] do |_task, args|
+  sources = VMTranslator::Driver.new(args.filename).sources
+
+  sources.each do |basename, source|
+    compiled = VMTranslator::Core.new(source, basename: basename, debug: args.debug).process
+
+    puts "<<file: #{basename}>>"
+    puts
+    puts compiled
+    puts
   end
 end
