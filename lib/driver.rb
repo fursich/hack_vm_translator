@@ -21,15 +21,17 @@ module VMTranslator
       expand_filenames!(path)
       raw_sources   = retrive_sources
       @sources      = format_sources(raw_sources)
-      append_init_caller!
+
+      append_init_caller! if @compilation_mode == :integrated
     end
 
     def run
-      assembly = @sources.map { |basename, source|
+      @assembly = @sources.map { |basename, source|
         VMTranslator::Core.new(source, basename: basename, debug: @debug).process
-      }.join("\n")
+      }
+      append_bootstrap_code! if @compilation_mode == :integrated
 
-      write_file(assembly, filename: @output_filename)
+      write_file(@assembly.join("\n"), filename: @output_filename)
     end
 
     private
@@ -55,6 +57,16 @@ module VMTranslator
           ]
         ]
       )
+    end
+
+    INITIAL_SP = 0x100
+    def append_bootstrap_code!
+      @assembly.unshift(<<~BOOTSTRAP.chomp)
+        @#{INITIAL_SP}
+        D = A
+        @SP
+        M = D
+      BOOTSTRAP
     end
 
     def read_from_file(filename)
@@ -89,7 +101,7 @@ module VMTranslator
       return unless @compilation_mode == :integrated
 
       raise FileError, 'no vm file(s) found in the directory' if @input_filenames.empty?
-      raise FileError, 'cannot find Sys.vm in the directory' unless @input_filenames.one?('Sys')
+      raise FileError, 'cannot find Sys.vm in the directory' unless @input_filenames.map{ |file| file.basename.to_s }.one?('Sys.vm')
     end
   end
 end
