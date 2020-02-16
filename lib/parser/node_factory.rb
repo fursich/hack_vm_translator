@@ -16,14 +16,14 @@ module Parser
 
     def command_node_class
       constantize(command_type, base: Parser::Node)
-    rescue NameError => _e
-      raise InvalidCommandName, "invalid command name: \'#{command_type}\' at line #{source_location}"
+    rescue NameError => e
+      raise InvalidCommandName, "invalid command name: \'#{command_type}\' at line #{source_location} \n(originally reported as: #{e.class}: #{e.message})"
     end
 
     def operand_nodes
       operand_types.zip(@tokens.operands).map { |type, value| constantize(type, base: Parser::Node).new(value) }
-    rescue NameError => _e
-      raise InvalidOperandName, "invalid operand type(s): \'#{@tokens.operands.join(' ')}\' at line #{source_location}"
+    rescue NameError => e
+      raise InvalidOperandName, "invalid operand type(s): \'#{@tokens.operands.join(' ')}\' at line #{source_location} \n(originally reported as: #{e.class}: #{e.message})"
     end
 
     def source_location
