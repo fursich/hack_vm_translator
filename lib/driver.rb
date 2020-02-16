@@ -15,10 +15,12 @@ module VMTranslator
     attr_reader :sources
 
     def initialize(path, debug: false)
-      @debug = debug
+      @debug        = debug
+      @line_counter = 1
 
       expand_filenames!(path)
-      @sources = retrive_sources
+      raw_sources   = retrive_sources
+      @sources      = format_sources(raw_sources)
     end
 
     def run
@@ -35,6 +37,13 @@ module VMTranslator
       @input_filenames.map do |filename|
         [filename.basename, read_from_file(filename)]
       end
+    end
+
+    def format_sources(raw_sources)
+      raw_sources.map { |basename, raw_source|
+        numbered_source = raw_source.split(/\r?\n/).map.with_index(2){ |code, lineno| [lineno, code] }
+        [basename, numbered_source]
+      }
     end
 
     def read_from_file(filename)
