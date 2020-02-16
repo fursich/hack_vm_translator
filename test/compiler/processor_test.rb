@@ -18,10 +18,53 @@ module Compiler
   class TestCompilerProcessor < Minitest::Test
     def test_command_push_constant
       Compiler::ProcessorTestHelper.compile_with_input(
-        'push constant 2',
+        'push constant stack',
       ) do |output|
         assert_equal <<~"ASSEMBLY".chomp, output
-          @2
+          @256
+          D = A
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+        ASSEMBLY
+      end
+
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'push constant heap',
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @2048
+          D = A
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+        ASSEMBLY
+      end
+
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'push constant screen',
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @SCREEN
+          D = A
+          @SP
+          A = M
+          M = D
+          @SP
+          M = M + 1
+        ASSEMBLY
+      end
+
+
+      Compiler::ProcessorTestHelper.compile_with_input(
+        'push constant keyboard',
+      ) do |output|
+        assert_equal <<~"ASSEMBLY".chomp, output
+          @KBD
           D = A
           @SP
           A = M
