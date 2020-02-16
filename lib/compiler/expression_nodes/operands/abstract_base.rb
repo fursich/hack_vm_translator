@@ -12,6 +12,7 @@ module Expression
 
     module MemorySegment
       class SegmentBase < OperandBase
+        attr_reader :name
         attr_reader :context
 
         def initialize(name, context:)

@@ -8,23 +8,41 @@ module Compiler
       Compiler::Processor.new(parsed_source, basename: basename)
     end
 
-    def self.context_before_compile(text, source_location: 1, basename: 'basename', &block)
+    def self.context_after_initialize(text, source_location: 1, basename: 'basename', &block)
       processor = prepare_processor(text, source_location: source_location, basename: basename)
-      node = processor.transform.first
 
-      block.call node.context
+      context = processor.instance_variable_get(:@transformer).context
+
+      block.call context
+    end
+
+    def self.context_before_compile(text, source_location: 1, basename: 'basename', &block)
+      processor = prepare_processor(text, source_location: source_location, basename: basename).tap(&:transform)
+
+      context = processor.instance_variable_get(:@transformer).context
+
+      block.call context
     end
 
     def self.context_after_compile(text, source_location: 1, basename: 'basename', &block)
-      processor = prepare_processor(text, source_location: source_location, basename: basename)
-      node = processor.transform.first
-      context = node.tap(&:compile).context
+      processor = prepare_processor(text, source_location: source_location, basename: basename).tap(&:compile)
+
+      context = processor.instance_variable_get(:@transformer).context
 
       block.call context
     end
   end
 
   class TestCompilerProcessorContext < Minitest::Test
+    def test_context
+      Compiler::ProcessorContextTestHelper.context_after_initialize(
+        'push constant 2',
+        basename: 'source_file',
+      ) do |context|
+        assert_instance_of Compiler::Transformer::Context, context
+      end
+    end
+
     def test_basename_are_properly_set_before_and_after_compile
       Compiler::ProcessorContextTestHelper.context_before_compile(
         'push constant 2',

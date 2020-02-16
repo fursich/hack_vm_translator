@@ -162,15 +162,15 @@ module Parser
     def test_symbols
       symbols = %w($foo Bar.baz label1 stack0)
 
-      symbols.each do |number|
+      symbols.each do |symbol|
         TypeMatcherTestHelper.tokens_with_input(
-         "pop local #{number}",
+         "call #{symbol} 5",
           source_location: 123,
         ) do |tokens|
           assert_instance_of TokenCollection, tokens
           assert_equal 3, tokens.size
-          assert_equal :pop, tokens.command_type
-          assert_equal [:"memory_segment/local", :symbol], tokens.operand_types
+          assert_equal :call , tokens.command_type
+          assert_equal [:symbol, :number], tokens.operand_types
         end
       end
     end

@@ -2,7 +2,7 @@ module Parser
   module Node
     class ReservedLabel < OperandBase
       def transform(context)
-        expression_node = constantize(Number, base: Expression::Node)
+        expression_node = constantize(:number, base: Expression::Node)
         expression_node.new(transformed_value, context: context)
       end
 
