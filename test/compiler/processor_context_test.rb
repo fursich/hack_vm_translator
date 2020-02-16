@@ -4,7 +4,7 @@ module Compiler
   module ProcessorContextTestHelper
     def self.prepare_processor(text, source_location:, basename:)
       source = [[source_location, text]]
-      parsed_source = Parser::Processor.new(source).parse!
+      parsed_source = Parser::Processor.new(source, basename: basename).parse!
       Compiler::Processor.new(parsed_source, basename: basename)
     end
 

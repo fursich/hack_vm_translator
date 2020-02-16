@@ -18,7 +18,7 @@ task :parse, [:filename] do |_task, args|
   sources = VMTranslator::Driver.new(args.filename).sources
 
   sources.each do |basename, source|
-    parsed = Parser::Processor.new(source).parse!
+    parsed = Parser::Processor.new(source, basename: basename).parse!
 
     puts "<<file: #{basename}>>"
     parsed.each do |node|

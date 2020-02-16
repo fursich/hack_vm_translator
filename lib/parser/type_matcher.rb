@@ -17,7 +17,8 @@ module Parser
   end
 
   class TypeMatcher
-    def initialize
+    def initialize(basename:)
+      @basename = basename
     end
 
     def collate!(tokens)

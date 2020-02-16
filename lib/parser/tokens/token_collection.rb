@@ -1,11 +1,11 @@
 module Parser
   class TokenCollection
-    attr_reader :raw_text, :source_location
+    attr_reader :raw_text, :source_location, :basename
     attr_accessor :command_type, :operand_types
 
     def initialize(tokens, raw_text:, source_location:)
-      @tokens = tokens
-      @raw_text = raw_text
+      @tokens          = tokens
+      @raw_text        = raw_text
       @source_location = source_location
     end
 

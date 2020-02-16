@@ -2,24 +2,20 @@ require 'test_helper'
 
 module Parser
   module NodeFactoryTestHelper
-    def self.prepare_tokens(text, source_location:)
+    def self.prepare_builder(text, basename: 'basename', source_location: 1, &block)
       tokens  = Parser::Tokenizer.new(text, source_location: source_location).tokenize
-      Parser::TypeMatcher.new.collate!(tokens)
-      tokens
+      Parser::TypeMatcher.new(basename: basename).collate!(tokens)
+      yield tokens if block_given?
+      Parser::NodeFactory.new(tokens, basename: basename)
     end
 
-    def self.prepare_builder(text, source_location:)
-      tokens = prepare_tokens(text, source_location: source_location)
-      Parser::NodeFactory.new(tokens)
-    end
-
-    def self.builder_with_input(text, source_location:, &block)
-      builder = prepare_builder(text, source_location: source_location)
+    def self.builder_with_input(text, source_location: 1, basename: 'basename', &block)
+      builder = prepare_builder(text, source_location: source_location, basename: basename)
       block.call builder
     end
 
-    def self.build_with_input(text, source_location:, &block)
-      builder = prepare_builder(text, source_location: source_location)
+    def self.build_with_input(text, source_location: 1, basename: 'basename', &block)
+      builder = prepare_builder(text, source_location: source_location, basename: basename)
       block.call builder.build
     end
   end
@@ -92,25 +88,25 @@ module Parser
     end
 
     def test_command_invalid_command_type
-      tokens = NodeFactoryTestHelper.prepare_tokens(
+      tokens = NodeFactoryTestHelper.prepare_builder(
         'pop local 3',
         source_location: 123,
-      ).tap { |tokens|
+      ) do |tokens|
         tokens.command_type = :an_invalid_command_type
-      }
+      end
 
-      assert_raises(Parser::InvalidCommandName) { Parser::NodeFactory.new(tokens).build }
+      assert_raises(Parser::InvalidCommandName) { Parser::NodeFactory.new(tokens, basename: 'basename').build }
     end
 
     def test_command_invalid_operand_type
-      tokens = NodeFactoryTestHelper.prepare_tokens(
+      tokens = NodeFactoryTestHelper.prepare_builder(
         'pop local 3',
         source_location: 123,
-      ).tap { |tokens|
+      ) do |tokens|
         tokens.operand_types[0] = :an_invalid_operand_type
-      }
+      end
 
-      assert_raises(InvalidOperandName) { Parser::NodeFactory.new(tokens).build }
+      assert_raises(InvalidOperandName) { Parser::NodeFactory.new(tokens, basename: 'basename').build }
     end
 
     def test_command_invalid_argument_size

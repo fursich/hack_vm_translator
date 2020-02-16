@@ -25,7 +25,7 @@ module VMTranslator
     private
 
     def compile
-      parsed_source = Parser::Processor.new(@source).parse!
+      parsed_source = Parser::Processor.new(@source, basename: @basename).parse!
       Compiler::Processor.new(parsed_source, basename: @basename).compile
     end
 

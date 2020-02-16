@@ -5,8 +5,8 @@ module Parser
       attr_reader :operands
 
       def initialize(*operands, raw_text:, source_location:)
-        @operands = operands
-        @raw_text = raw_text
+        @operands        = operands
+        @raw_text        = raw_text
         @source_location = source_location
         validate!
       end

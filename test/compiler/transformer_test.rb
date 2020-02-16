@@ -4,7 +4,7 @@ module Compiler
   module TransformerTestHelper
     def self.prepare_transformer(text, source_location:, basename:)
       source = [[source_location, text]]
-      parse_nodes = Parser::Processor.new(source).parse!
+      parse_nodes = Parser::Processor.new(source, basename: basename).parse!
       Compiler::Transformer.new(parse_nodes, basename: basename)
     end
 

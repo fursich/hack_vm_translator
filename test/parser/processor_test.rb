@@ -2,18 +2,18 @@ require 'test_helper'
 
 module Parser
   module ProcessorTestHelper
-    def self.prepare_processor(*text, &block)
+    def self.prepare_processor(*text, basename: 'basename', &block)
       text_with_lineno = text.map.with_index(1) { |text, line_no| [line_no, text] }
-      Parser::Processor.new(text_with_lineno)
+      Parser::Processor.new(text_with_lineno, basename: basename)
     end
 
-    def self.processor_with_input(*text, &block)
-      processor = prepare_processor(*text, &block)
+    def self.processor_with_input(*text, basename: 'basename', &block)
+      processor = prepare_processor(*text, basename: basename, &block)
       block.call processor
     end
 
-    def self.process(*text, &block)
-      processor = prepare_processor(*text, &block)
+    def self.process(*text, basename: 'basename', &block)
+      processor = prepare_processor(*text, basename: basename, &block)
       block.call processor.parse!
     end
   end

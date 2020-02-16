@@ -2,13 +2,13 @@ require 'test_helper'
 
 module Parser
   module TypeMatcherTestHelper
-    def self.tokenize(text, source_location:)
+    def self.tokenize(text, source_location: '1')
       Parser::Tokenizer.new(text, source_location: source_location).tokenize
     end
 
-    def self.tokens_with_input(text, source_location:, &block)
+    def self.tokens_with_input(text, basename: 'basename', source_location: '1', &block)
       tokens = tokenize(text, source_location: source_location)
-      Parser::TypeMatcher.new.collate!(tokens)
+      Parser::TypeMatcher.new(basename: basename).collate!(tokens)
       block.call tokens
     end
   end
@@ -26,7 +26,6 @@ module Parser
     def test_raw_text
       TypeMatcherTestHelper.tokens_with_input(
         "push local 3",
-        source_location: 123,
       ) do |tokens|
         assert_equal "push local 3", tokens.raw_text
       end
@@ -35,7 +34,6 @@ module Parser
     def test_blank_command
       TypeMatcherTestHelper.tokens_with_input(
         "   ",
-        source_location: 123,
       ) do |tokens|
         assert_nil tokens
       end
@@ -44,7 +42,6 @@ module Parser
     def test_comments
       TypeMatcherTestHelper.tokens_with_input(
         " // comment",
-        source_location: 123,
       ) do |tokens|
         assert_nil tokens
       end
@@ -56,7 +53,6 @@ module Parser
       valid_commands.each do |command|
         TypeMatcherTestHelper.tokens_with_input(
           command,
-          source_location: 123,
         ) do |tokens|
           assert_instance_of TokenCollection, tokens
           assert_equal 1, tokens.size
@@ -71,10 +67,9 @@ module Parser
       invalid_commands.each do |command|
         tokens = TypeMatcherTestHelper.tokenize(
           command,
-          source_location: 123,
         )
         assert_raises(Parser::InvalidCommandName) {
-          Parser::TypeMatcher.new.collate!(tokens)
+          Parser::TypeMatcher.new(basename: 'basename').collate!(tokens)
         }
       end
     end
@@ -82,7 +77,6 @@ module Parser
     def test_command_with_one_operand
        TypeMatcherTestHelper.tokens_with_input(
         "label FOO_BAR",
-         source_location: 123,
        ) do |tokens|
          assert_instance_of TokenCollection, tokens
          assert_equal 2, tokens.size
@@ -97,10 +91,9 @@ module Parser
       invalid_operands.each do |operand|
         tokens = TypeMatcherTestHelper.tokenize(
           "goto #{operand}",
-          source_location: 123,
         )
         assert_raises(Parser::InvalidOperandName) {
-          Parser::TypeMatcher.new.collate!(tokens)
+          Parser::TypeMatcher.new(basename: 'basename').collate!(tokens)
         }
       end
     end
@@ -108,7 +101,6 @@ module Parser
     def test_command_with_two_operands
       TypeMatcherTestHelper.tokens_with_input(
        "push static 10",
-        source_location: 123,
       ) do |tokens|
         assert_instance_of TokenCollection, tokens
         assert_equal 3, tokens.size
@@ -120,10 +112,9 @@ module Parser
     def test_command_with_three_or_more_operands
       tokens = TypeMatcherTestHelper.tokenize(
         'pop local 3 1',
-        source_location: 123,
       )
       assert_raises(Parser::UndefinedCommandPattern) {
-        Parser::TypeMatcher.new.collate!(tokens)
+        Parser::TypeMatcher.new(basename: 'basename').collate!(tokens)
       }
     end
 
@@ -133,7 +124,6 @@ module Parser
       reserved_labels.each do |label|
         TypeMatcherTestHelper.tokens_with_input(
          "push constant #{label}",
-          source_location: 123,
         ) do |tokens|
           assert_instance_of TokenCollection, tokens
           assert_equal 3, tokens.size
@@ -149,7 +139,6 @@ module Parser
       numbers.each do |number|
         TypeMatcherTestHelper.tokens_with_input(
          "pop local #{number}",
-          source_location: 123,
         ) do |tokens|
           assert_instance_of TokenCollection, tokens
           assert_equal 3, tokens.size
@@ -165,7 +154,6 @@ module Parser
       symbols.each do |symbol|
         TypeMatcherTestHelper.tokens_with_input(
          "call #{symbol} 5",
-          source_location: 123,
         ) do |tokens|
           assert_instance_of TokenCollection, tokens
           assert_equal 3, tokens.size
@@ -181,7 +169,6 @@ module Parser
       valid_segments.each do |segment|
         TypeMatcherTestHelper.tokens_with_input(
          "push #{segment} 3",
-          source_location: 123,
         ) do |tokens|
           assert_instance_of TokenCollection, tokens
           assert_equal 3, tokens.size

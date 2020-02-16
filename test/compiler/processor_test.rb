@@ -4,7 +4,7 @@ module Compiler
   module ProcessorTestHelper
     def self.prepare_compiler(text, source_location:, basename:)
       source = [[source_location, text]]
-      parsed_source = Parser::Processor.new(source).parse!
+      parsed_source = Parser::Processor.new(source, basename: basename).parse!
       Compiler::Processor.new(parsed_source, basename: basename)
     end
 

@@ -3,9 +3,13 @@ require_relative 'nodes/node.rb'
 module Parser
   class NodeFactory
     include Inflector
+    extend Forwardable
 
-    def initialize(tokens)
+    def_delegators :@tokens, *%i(source_location raw_text command_type operands operand_types)
+
+    def initialize(tokens, basename:)
       @tokens = tokens
+      @basename = basename
     end
 
     def build
@@ -21,25 +25,9 @@ module Parser
     end
 
     def operand_nodes
-      operand_types.zip(@tokens.operands).map { |type, value| constantize(type, base: Parser::Node).new(value) }
+      operand_types.zip(operands).map { |type, value| constantize(type, base: Parser::Node).new(value) }
     rescue NameError => e
-      raise InvalidOperandName, "invalid operand type(s): \'#{@tokens.operands.join(' ')}\' at line #{source_location} \n(originally reported as: #{e.class}: #{e.message})"
-    end
-
-    def source_location
-      @tokens.source_location
-    end
-
-    def raw_text
-      @tokens.raw_text
-    end
-
-    def command_type
-      @tokens.command_type
-    end
-
-    def operand_types
-      @tokens.operand_types
+      raise InvalidOperandName, "invalid operand type(s): \'#{operands.join(' ')}\' at line #{source_location} \n(originally reported as: #{e.class}: #{e.message})"
     end
   end
 end
